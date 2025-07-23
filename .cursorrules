@@ -6,7 +6,7 @@ To enable the MCP tool in Cursor:
 
 1. The MCP server is located at: mcp-magisterium.ts
 2. Run command: node --loader ts-node/esm mcp-magisterium.ts
-3. Working directory: /Users/pink/Documents/magisterium
+3. Working directory: /Users/pink/Documents/magisterium_mcp_server
 4. Environment: Requires MAGISTERIUM_API_KEY in .env file
 
 Tool available: magisterium_query

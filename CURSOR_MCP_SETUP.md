@@ -8,7 +8,7 @@ Follow these steps to properly configure the Magisterium MCP tool in Cursor:
 
 Test the MCP server manually:
 ```bash
-cd /Users/pink/Documents/magisterium
+cd /Users/pink/Documents/magisterium_mcp_server
 echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}' | node mcp-magisterium.cjs
 ```
 
@@ -25,7 +25,7 @@ Add this configuration to your Cursor MCP settings:
     "magisterium": {
       "command": "node",
       "args": ["--loader", "ts-node/esm", "mcp-magisterium.ts"],
-      "cwd": "/Users/pink/Documents/magisterium"
+      "cwd": "/Users/pink/Documents/magisterium_mcp_server"
     }
   }
 }
@@ -38,7 +38,7 @@ Add this configuration to your Cursor MCP settings:
     "magisterium": {
       "command": "node",
       "args": ["mcp-magisterium.cjs"],
-      "cwd": "/Users/pink/Documents/magisterium"
+      "cwd": "/Users/pink/Documents/magisterium_mcp_server"
     }
   }
 }

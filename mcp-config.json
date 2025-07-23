@@ -3,7 +3,7 @@
     "magisterium": {
       "command": "node",
       "args": ["--loader", "ts-node/esm", "mcp-magisterium.ts"],
-      "cwd": "/Users/pink/Documents/magisterium",
+      "cwd": "/Users/pink/Documents/magisterium_mcp_server",
       "env": {
         "NODE_ENV": "production"
       }
