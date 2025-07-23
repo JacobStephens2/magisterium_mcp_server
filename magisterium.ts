@@ -5,28 +5,32 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 interface MagisteriumResponse {
+  id: string;
+  object: string;
+  created: number;
+  model: string;
   choices: Array<{
+    index: number;
     message: {
+      role: string;
       content: string;
     };
+    finish_reason: string;
   }>;
+  usage?: {
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    total_tokens?: number;
+  };
 }
 
-interface StreamChunk {
-  choices: Array<{
-    delta: {
-      content?: string;
-    };
-  }>;
-}
-
-export async function getMagisteriumAnswer() {
+export async function getMagisteriumAnswer(): Promise<any> {
   const apiKey = (process as any).env.MAGISTERIUM_API_KEY;
   
   if (!apiKey) {
     console.error('Error: MAGISTERIUM_API_KEY environment variable is not set');
     console.log('Please set your API key in a .env file: MAGISTERIUM_API_KEY="your-api-key-here"');
-    return;
+    return null;
   }
 
   try {
@@ -44,7 +48,6 @@ export async function getMagisteriumAnswer() {
             content: 'What is the Magisterium?'
           }
         ],
-        "stream": true,
         "return_related_questions": true
       })
     });
@@ -52,49 +55,28 @@ export async function getMagisteriumAnswer() {
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`API Error (${response.status}): ${errorText}`);
-      return;
+      return null;
     }
 
-    // Handle streaming response
-    const reader = response.body?.getReader();
-    const decoder = new TextDecoder();
-    let fullContent = '';
-
-    if (reader) {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const jsonStr = line.slice(6); // Remove 'data: ' prefix
-            if (jsonStr.trim() === '[DONE]') {
-              break;
-            }
-            
-            try {
-              const parsed = JSON.parse(jsonStr) as StreamChunk;
-              if (parsed.choices?.[0]?.delta?.content) {
-                fullContent += parsed.choices[0].delta.content;
-                process.stdout.write(parsed.choices[0].delta.content);
-              }
-            } catch (parseError) {
-              // Skip invalid JSON chunks
-              continue;
-            }
-          }
-        }
-      }
-    }
-
-    console.log('\n\nFull response:', fullContent);
+    // Handle non-streaming response
+    const results = await response.json() as MagisteriumResponse;
+    
+    // Display the response content
+    console.log(results.choices[0].message.content);
+    
+    console.log('\n\n--- Full JSON Response ---');
+    console.log(JSON.stringify(results, null, 2));
+    
+    return results;
   } catch (error) {
     console.error('Error calling Magisterium API:', error);
+    return null;
   }
 }
 
-// Call the function
-getMagisteriumAnswer().catch(console.error);
+// Call the function and handle the response
+getMagisteriumAnswer()
+  .then(result => {
+    // Function completed - no additional summary needed
+  })
+  .catch(console.error);
