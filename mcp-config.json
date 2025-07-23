@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "magisterium": {
+      "command": "node",
+      "args": ["--loader", "ts-node/esm", "mcp-magisterium.ts"],
+      "cwd": "/Users/pink/Documents/magisterium",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+} 

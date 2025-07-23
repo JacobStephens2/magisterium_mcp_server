@@ -1,0 +1,15 @@
+# MCP Server Configuration for Cursor
+
+This directory contains a Magisterium API MCP server.
+
+To enable the MCP tool in Cursor:
+
+1. The MCP server is located at: mcp-magisterium.ts
+2. Run command: node --loader ts-node/esm mcp-magisterium.ts
+3. Working directory: /Users/pink/Documents/magisterium
+4. Environment: Requires MAGISTERIUM_API_KEY in .env file
+
+Tool available: magisterium_query
+- Query Catholic Church teaching
+- Returns authoritative responses with citations
+- Parameters: query (required), model (optional), return_related_questions (optional) 

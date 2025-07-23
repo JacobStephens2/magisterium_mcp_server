@@ -49,6 +49,56 @@ node dist/magisterium.js
 node magisterium.js
 ```
 
+## MCP (Model Context Protocol) Tool
+
+This project includes an MCP server that provides a `magisterium_query` tool for AI assistants to query the Magisterium API directly.
+
+### Running the MCP Server
+
+```bash
+npm run mcp
+```
+
+### MCP Tool Usage
+
+The MCP server provides a `magisterium_query` tool with the following parameters:
+
+- **query** (required): The question or topic to ask about Catholic Church teaching
+- **model** (optional): The model to use (default: "magisterium-1")
+- **return_related_questions** (optional): Whether to return related questions (default: true)
+
+### Example MCP Tool Call
+
+```json
+{
+  "name": "magisterium_query",
+  "arguments": {
+    "query": "What does the Catholic Church teach about the Eucharist?",
+    "model": "magisterium-1",
+    "return_related_questions": true
+  }
+}
+```
+
+### Integrating with MCP Clients
+
+To use this MCP server with compatible AI assistants:
+
+1. **Claude Desktop**: Add the server configuration to your `claude_desktop_config.json`:
+   ```json
+   {
+     "mcpServers": {
+       "magisterium": {
+         "command": "node",
+         "args": ["--loader", "ts-node/esm", "mcp-magisterium.ts"],
+         "cwd": "/path/to/magisterium"
+       }
+     }
+   }
+   ```
+
+2. **Other MCP Clients**: Use the provided `mcp-config.json` as a reference for configuration.
+
 ## API Usage
 
 The code makes a direct API call to the Magisterium API:

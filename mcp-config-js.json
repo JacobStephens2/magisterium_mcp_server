@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "magisterium": {
+      "command": "node",
+      "args": ["mcp-magisterium.js"],
+      "cwd": "/Users/pink/Documents/magisterium"
+    }
+  }
+} 

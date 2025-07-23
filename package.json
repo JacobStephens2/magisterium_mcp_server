@@ -1,11 +1,18 @@
 {
+  "type": "module",
   "dependencies": {
+    "magisterium": "^0.0.5",
     "dotenv": "^17.2.0",
-    "magisterium": "^0.0.5"
+    "@modelcontextprotocol/sdk": "^1.1.0"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "mcp": "node --loader ts-node/esm mcp-magisterium.ts",
+    "build": "npx tsc",
+    "start": "node dist/magisterium.js"
   }
 }
