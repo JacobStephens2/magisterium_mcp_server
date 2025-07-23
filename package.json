@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "dotenv": "^17.2.0",
     "magisterium": "^0.0.5"
   },
   "devDependencies": {

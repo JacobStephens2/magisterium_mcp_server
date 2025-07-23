@@ -1,4 +1,8 @@
 // Direct API call using fetch
+import * as dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 interface MagisteriumResponse {
   choices: Array<{
@@ -13,7 +17,7 @@ export async function getMagisteriumAnswer() {
   
   if (!apiKey) {
     console.error('Error: MAGISTERIUM_API_KEY environment variable is not set');
-    console.log('Please set your API key: export MAGISTERIUM_API_KEY="your-api-key-here"');
+    console.log('Please set your API key in a .env file: MAGISTERIUM_API_KEY="your-api-key-here"');
     return;
   }
 
