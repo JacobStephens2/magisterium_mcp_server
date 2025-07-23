@@ -12,6 +12,14 @@ interface MagisteriumResponse {
   }>;
 }
 
+interface StreamChunk {
+  choices: Array<{
+    delta: {
+      content?: string;
+    };
+  }>;
+}
+
 export async function getMagisteriumAnswer() {
   const apiKey = (process as any).env.MAGISTERIUM_API_KEY;
   
@@ -35,7 +43,9 @@ export async function getMagisteriumAnswer() {
             role: 'user',
             content: 'What is the Magisterium?'
           }
-        ]
+        ],
+        "stream": true,
+        "return_related_questions": true
       })
     });
 
@@ -45,8 +55,42 @@ export async function getMagisteriumAnswer() {
       return;
     }
 
-    const results = await response.json() as MagisteriumResponse;
-    console.log(results.choices[0].message);
+    // Handle streaming response
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+    let fullContent = '';
+
+    if (reader) {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const jsonStr = line.slice(6); // Remove 'data: ' prefix
+            if (jsonStr.trim() === '[DONE]') {
+              break;
+            }
+            
+            try {
+              const parsed = JSON.parse(jsonStr) as StreamChunk;
+              if (parsed.choices?.[0]?.delta?.content) {
+                fullContent += parsed.choices[0].delta.content;
+                process.stdout.write(parsed.choices[0].delta.content);
+              }
+            } catch (parseError) {
+              // Skip invalid JSON chunks
+              continue;
+            }
+          }
+        }
+      }
+    }
+
+    console.log('\n\nFull response:', fullContent);
   } catch (error) {
     console.error('Error calling Magisterium API:', error);
   }

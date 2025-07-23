@@ -64,6 +64,7 @@ curl -X POST https://www.magisterium.com/api/v1/chat/completions \
         "role": "user",
         "content": "What is the Magisterium?"
         }
-    ]
+    ],
+    "stream": True
     }'
 ```

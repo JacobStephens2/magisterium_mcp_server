@@ -59,7 +59,9 @@ async function getMagisteriumAnswer() {
                         role: 'user',
                         content: 'What is the Magisterium?'
                     }
-                ]
+                ],
+                "stream": true,
+                "return_related_questions": true
             })
         });
         if (!response.ok) {
@@ -67,8 +69,39 @@ async function getMagisteriumAnswer() {
             console.error(`API Error (${response.status}): ${errorText}`);
             return;
         }
-        const results = await response.json();
-        console.log(results.choices[0].message);
+        // Handle streaming response
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        let fullContent = '';
+        if (reader) {
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done)
+                    break;
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split('\n');
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const jsonStr = line.slice(6); // Remove 'data: ' prefix
+                        if (jsonStr.trim() === '[DONE]') {
+                            break;
+                        }
+                        try {
+                            const parsed = JSON.parse(jsonStr);
+                            if (parsed.choices?.[0]?.delta?.content) {
+                                fullContent += parsed.choices[0].delta.content;
+                                process.stdout.write(parsed.choices[0].delta.content);
+                            }
+                        }
+                        catch (parseError) {
+                            // Skip invalid JSON chunks
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+        console.log('\n\nFull response:', fullContent);
     }
     catch (error) {
         console.error('Error calling Magisterium API:', error);
