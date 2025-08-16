@@ -1,9 +1,10 @@
 {
   "type": "module",
   "dependencies": {
-    "magisterium": "^0.0.5",
+    "@modelcontextprotocol/sdk": "^1.1.0",
     "dotenv": "^17.2.0",
-    "@modelcontextprotocol/sdk": "^1.1.0"
+    "magisterium": "^0.0.5",
+    "node-fetch": "^2.7.0"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",

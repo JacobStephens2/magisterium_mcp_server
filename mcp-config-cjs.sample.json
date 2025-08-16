@@ -3,7 +3,7 @@
     "magisterium": {
       "command": "node",
       "args": ["mcp-magisterium.cjs"],
-      "cwd": "/Users/pink/Documents/magisterium_mcp_server"
+      "cwd": "/var/www/magisterium_mcp_server"
     }
   }
-}
+} 

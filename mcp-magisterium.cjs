@@ -38,6 +38,7 @@ const index_js_1 = require("@modelcontextprotocol/sdk/server/index.js");
 const stdio_js_1 = require("@modelcontextprotocol/sdk/server/stdio.js");
 const types_js_1 = require("@modelcontextprotocol/sdk/types.js");
 const dotenv = __importStar(require("dotenv"));
+const fetch = require("node-fetch");
 // Load environment variables
 dotenv.config();
 class MagisteriumMCPServer {

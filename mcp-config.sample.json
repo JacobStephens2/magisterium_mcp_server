@@ -2,8 +2,8 @@
   "mcpServers": {
     "magisterium": {
       "command": "node",
-      "args": ["--loader", "ts-node/esm", "mcp-magisterium.ts"],
-      "cwd": "/Users/pink/Documents/magisterium_mcp_server",
+      "args": ["mcp-magisterium.cjs"],
+      "cwd": "/var/www/magisterium_mcp_server",
       "env": {
         "NODE_ENV": "production"
       }

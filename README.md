@@ -2,6 +2,11 @@
 
 A TypeScript client for interfacing with the Magisterium API.
 
+## Environment
+
+Requires at least Node.js 12.20.0 given use of node-fetch (https://www.npmjs.com/package/node-fetch?activeTab=readme)
+
+
 ## Setup
 
 1. **Install dependencies:**
@@ -91,7 +96,10 @@ To use this MCP server with compatible AI assistants:
        "magisterium": {
          "command": "node",
          "args": ["--loader", "ts-node/esm", "mcp-magisterium.ts"],
-         "cwd": "/path/to/magisterium"
+         "cwd": "/path/to/magisterium",
+          "env": {
+            "MAGISTERIUM_API_KEY": ""
+          }
        }
      }
    }
