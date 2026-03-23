@@ -103,7 +103,10 @@ class MagisteriumMCPServer {
 
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       if (request.params.name !== 'magisterium_query') {
-        throw new Error(`Unknown tool: ${request.params.name}`);
+        return {
+          content: [{ type: 'text', text: `Unknown tool: ${request.params.name}` }],
+          isError: true,
+        };
       }
 
       const { query, model = 'magisterium-1', return_related_questions = true } = request.params.arguments as {
@@ -113,62 +116,108 @@ class MagisteriumMCPServer {
       };
 
       if (!query) {
-        throw new Error('Query parameter is required');
+        return {
+          content: [{ type: 'text', text: 'Query parameter is required' }],
+          isError: true,
+        };
       }
 
       try {
         const result = await this.callMagisteriumAPI(query, model, return_related_questions);
-        
+
         return {
           content: [
             {
               type: 'text',
-              text: JSON.stringify(result, null, 2),
+              text: this.formatResponse(result),
             },
           ],
         };
       } catch (error) {
-        throw new Error(`Failed to query Magisterium API: ${error}`);
+        const message = error instanceof Error ? error.message : String(error);
+        return {
+          content: [{ type: 'text', text: `Failed to query Magisterium API: ${message}` }],
+          isError: true,
+        };
       }
     });
   }
 
+  private formatResponse(result: MagisteriumResponse): string {
+    const parts: string[] = [];
+
+    const answer = result.choices?.[0]?.message?.content;
+    if (answer) {
+      parts.push(answer);
+    }
+
+    if (result.citations && result.citations.length > 0) {
+      parts.push('\n---\n**Citations:**');
+      for (const cite of result.citations) {
+        const source = cite.source_url ? ` (${cite.source_url})` : '';
+        parts.push(`- **${cite.document_title}** — ${cite.document_author}`);
+        if (cite.document_reference) {
+          parts.push(`  ${cite.document_reference}${source}`);
+        }
+        if (cite.cited_text_heading) {
+          parts.push(`  Section: ${cite.cited_text_heading}`);
+        }
+      }
+    }
+
+    if (result.related_questions && result.related_questions.length > 0) {
+      parts.push('\n**Related Questions:**');
+      for (const q of result.related_questions) {
+        parts.push(`- ${q}`);
+      }
+    }
+
+    return parts.join('\n');
+  }
+
   private async callMagisteriumAPI(
-    query: string, 
-    model: string, 
+    query: string,
+    model: string,
     returnRelatedQuestions: boolean
   ): Promise<MagisteriumResponse> {
     const apiKey = process.env.MAGISTERIUM_API_KEY;
-    
+
     if (!apiKey) {
       throw new Error('MAGISTERIUM_API_KEY environment variable is not set');
     }
 
-    const response = await fetch('https://www.magisterium.com/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          {
-            role: 'user',
-            content: query,
-          }
-        ],
-        return_related_questions: returnRelatedQuestions,
-      })
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30_000);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`API Error (${response.status}): ${errorText}`);
+    try {
+      const response = await fetch('https://www.magisterium.com/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            {
+              role: 'user',
+              content: query,
+            }
+          ],
+          return_related_questions: returnRelatedQuestions,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API Error (${response.status}): ${errorText}`);
+      }
+
+      return await response.json() as MagisteriumResponse;
+    } finally {
+      clearTimeout(timeout);
     }
-
-    const results = await response.json() as MagisteriumResponse;
-    return results;
   }
 
   async run(): Promise<void> {
