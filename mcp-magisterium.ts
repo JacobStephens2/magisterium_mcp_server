@@ -128,7 +128,7 @@ class MagisteriumMCPServer {
           content: [
             {
               type: 'text',
-              text: this.formatResponse(result),
+              text: JSON.stringify(result, null, 2),
             },
           ],
         };
@@ -140,38 +140,6 @@ class MagisteriumMCPServer {
         };
       }
     });
-  }
-
-  private formatResponse(result: MagisteriumResponse): string {
-    const parts: string[] = [];
-
-    const answer = result.choices?.[0]?.message?.content;
-    if (answer) {
-      parts.push(answer);
-    }
-
-    if (result.citations && result.citations.length > 0) {
-      parts.push('\n---\n**Citations:**');
-      for (const cite of result.citations) {
-        const source = cite.source_url ? ` (${cite.source_url})` : '';
-        parts.push(`- **${cite.document_title}** — ${cite.document_author}`);
-        if (cite.document_reference) {
-          parts.push(`  ${cite.document_reference}${source}`);
-        }
-        if (cite.cited_text_heading) {
-          parts.push(`  Section: ${cite.cited_text_heading}`);
-        }
-      }
-    }
-
-    if (result.related_questions && result.related_questions.length > 0) {
-      parts.push('\n**Related Questions:**');
-      for (const q of result.related_questions) {
-        parts.push(`- ${q}`);
-      }
-    }
-
-    return parts.join('\n');
   }
 
   private async callMagisteriumAPI(
