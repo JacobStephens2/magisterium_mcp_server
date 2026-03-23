@@ -38,7 +38,7 @@ Copy `mcp-config.sample.json` and replace the path with your actual install loca
 
 ### Claude Desktop / Claude Code
 
-Add to your MCP config (`claude_desktop_config.json` or `~/.claude.json`):
+Add to your MCP config (`claude_desktop_config.json` for Desktop, `~/.claude/settings.json` for Claude Code):
 
 ```json
 {
