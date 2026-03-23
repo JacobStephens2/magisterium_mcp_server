@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "MCP server for querying the Magisterium API for authoritative Catholic Church teaching with citations",
   "type": "module",
+  "bin": {
+    "magisterium-mcp-server": "dist/mcp-magisterium.js"
+  },
   "engines": {
     "node": ">=18.0.0"
   },
