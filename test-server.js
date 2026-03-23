@@ -14,17 +14,11 @@ const mcpProcess = spawn('node', ['dist/mcp-magisterium.js'], {
 });
 
 let output = '';
+let stderr = '';
 
-mcpProcess.stdout.on('data', (data) => {
-  output += data.toString();
-});
+mcpProcess.stdout.on('data', (data) => { output += data.toString(); });
+mcpProcess.stderr.on('data', (data) => { stderr += data.toString(); });
 
-mcpProcess.stderr.on('data', (data) => {
-  const msg = data.toString().trim();
-  if (msg) console.error('stderr:', msg);
-});
-
-// MCP requires an initialize handshake before listing tools
 const initRequest = {
   jsonrpc: "2.0",
   id: 1,
@@ -43,6 +37,12 @@ const listToolsRequest = {
   params: {}
 };
 
+function fail(message) {
+  console.error(`FAIL: ${message}`);
+  mcpProcess.kill();
+  process.exit(1);
+}
+
 mcpProcess.stdin.write(JSON.stringify(initRequest) + '\n');
 
 setTimeout(() => {
@@ -50,19 +50,46 @@ setTimeout(() => {
 }, 500);
 
 setTimeout(() => {
-  if (output) {
-    console.log('Server responses:');
-    output.split('\n').filter(Boolean).forEach((line) => {
-      try {
-        const parsed = JSON.parse(line);
-        console.log(JSON.stringify(parsed, null, 2));
-      } catch {
-        console.log(line);
-      }
-    });
-    console.log('\nServer is working correctly.');
-  } else {
-    console.log('No response received from server.');
-  }
   mcpProcess.kill();
+
+  const lines = output.split('\n').filter(Boolean);
+
+  if (lines.length < 2) {
+    fail(`Expected 2 responses, got ${lines.length}. stderr: ${stderr}`);
+  }
+
+  let initResponse, toolsResponse;
+  try {
+    initResponse = JSON.parse(lines[0]);
+    toolsResponse = JSON.parse(lines[1]);
+  } catch {
+    fail(`Failed to parse JSON responses.\nLine 0: ${lines[0]}\nLine 1: ${lines[1]}`);
+  }
+
+  // Verify initialize response
+  if (!initResponse.result?.serverInfo?.name) {
+    fail(`Initialize response missing serverInfo: ${JSON.stringify(initResponse)}`);
+  }
+
+  // Verify tools/list response
+  const tools = toolsResponse.result?.tools;
+  if (!Array.isArray(tools) || tools.length === 0) {
+    fail(`No tools returned: ${JSON.stringify(toolsResponse)}`);
+  }
+
+  const magTool = tools.find(t => t.name === 'magisterium_query');
+  if (!magTool) {
+    fail(`magisterium_query tool not found. Tools: ${tools.map(t => t.name).join(', ')}`);
+  }
+
+  const required = magTool.inputSchema?.required;
+  if (!required?.includes('query')) {
+    fail(`magisterium_query missing required 'query' parameter`);
+  }
+
+  console.log(`Server: ${initResponse.result.serverInfo.name} v${initResponse.result.serverInfo.version}`);
+  console.log(`Protocol: ${initResponse.result.protocolVersion}`);
+  console.log(`Tools: ${tools.map(t => t.name).join(', ')}`);
+  console.log('\nAll checks passed.');
+  process.exit(0);
 }, 2000);

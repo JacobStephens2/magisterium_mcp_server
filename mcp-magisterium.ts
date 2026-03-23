@@ -9,8 +9,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import * as dotenv from 'dotenv';
 
-// Load environment variables
-dotenv.config();
+dotenv.config({ quiet: true });
 
 interface MagisteriumResponse {
   id: string;
