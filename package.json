@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "dev": "tsc --watch",
     "start": "node dist/mcp-magisterium.js",
     "test": "node test-server.js"
   },
