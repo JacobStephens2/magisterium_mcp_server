@@ -1,128 +1,110 @@
-# Magisterium API Client
+# Magisterium MCP Server
 
-A TypeScript client for interfacing with the Magisterium API.
+An [MCP](https://modelcontextprotocol.io/) server that provides AI assistants with access to the [Magisterium API](https://www.magisterium.com/) for authoritative Catholic Church teaching with citations.
 
-## Environment
+Exposes one tool — `magisterium_query` — that any MCP-compatible client (Claude Desktop, Claude Code, Cursor, etc.) can call.
 
-Requires at least Node.js 12.20.0 given use of node-fetch (https://www.npmjs.com/package/node-fetch?activeTab=readme)
+## Prerequisites
 
+- **Node.js 18+** (check with `node --version`)
+- **Magisterium API key** from [magisterium.com](https://www.magisterium.com/)
 
 ## Setup
 
-1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-2. **Set up your API key:**
-   Create a `.env` file in the project root and add your API key:
-   ```
-   MAGISTERIUM_API_KEY=your-actual-api-key-here
-   ```
-
-## Compiling TypeScript
-
-You have several options to compile the TypeScript code:
-
-### Method 1: Using tsconfig.json (Recommended)
 ```bash
-npx tsc
-```
-This compiles the TypeScript files and outputs them to the `dist/` directory.
-
-### Method 2: Direct compilation with options
-```bash
-npx tsc --target es2020 --module commonjs magisterium.ts
-```
-This creates `magisterium.js` in the current directory.
-
-### Method 3: Simple compilation
-```bash
-npx tsc magisterium.ts
-```
-Uses default TypeScript settings and creates `magisterium.js` in the current directory.
-
-## Running the Code
-
-After compilation, you can run the code:
-
-```bash
-# If compiled with tsconfig.json (Method 1)
-node dist/magisterium.js
-
-# If compiled with Method 2 or 3
-node magisterium.js
+git clone https://github.com/JacobStephens2/magisterium_mcp_server.git
+cd magisterium_mcp_server
+npm install
+npm run build
 ```
 
-## MCP (Model Context Protocol) Tool
+Create a `.env` file with your API key (see `.env.example`):
 
-This project includes an MCP server that provides a `magisterium_query` tool for AI assistants to query the Magisterium API directly.
-
-### Running the MCP Server
-
-```bash
-npm run mcp
+```
+MAGISTERIUM_API_KEY=sk_your_key_here
 ```
 
-### MCP Tool Usage
+Verify it works:
 
-The MCP server provides a `magisterium_query` tool with the following parameters:
+```bash
+npm test
+```
 
-- **query** (required): The question or topic to ask about Catholic Church teaching
-- **model** (optional): The model to use (default: "magisterium-1")
-- **return_related_questions** (optional): Whether to return related questions (default: true)
+You should see a JSON response listing the `magisterium_query` tool.
 
-### Example MCP Tool Call
+## Configuring MCP Clients
+
+Copy `mcp-config.sample.json` and replace the path with your actual install location.
+
+### Claude Desktop / Claude Code
+
+Add to your MCP config (`claude_desktop_config.json` or `~/.claude.json`):
+
+```json
+{
+  "mcpServers": {
+    "magisterium": {
+      "command": "/bin/bash",
+      "args": ["/path/to/magisterium_mcp_server/run-magisterium.sh"]
+    }
+  }
+}
+```
+
+### Cursor
+
+Add to `.cursor/mcp.json` (workspace) or `~/.config/cursor/mcp.json` (global):
+
+```json
+{
+  "mcpServers": {
+    "magisterium": {
+      "command": "/bin/bash",
+      "args": ["/path/to/magisterium_mcp_server/run-magisterium.sh"]
+    }
+  }
+}
+```
+
+Then restart Cursor and enable the server under Settings > MCP Tools.
+
+## Tool: `magisterium_query`
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | yes | — | Question about Catholic Church teaching |
+| `model` | string | no | `magisterium-1` | Model to use |
+| `return_related_questions` | boolean | no | `true` | Include related questions in response |
+
+### Example
 
 ```json
 {
   "name": "magisterium_query",
   "arguments": {
-    "query": "What does the Catholic Church teach about the Eucharist?",
-    "model": "magisterium-1",
-    "return_related_questions": true
+    "query": "What does the Catholic Church teach about the Eucharist?"
   }
 }
 ```
 
-### Integrating with MCP Clients
+The response includes the teaching text, citations with document references, and optionally related questions.
 
-To use this MCP server with compatible AI assistants:
-
-1. **Claude Desktop**: Add the server configuration to your `claude_desktop_config.json`:
-   ```json
-   {
-     "mcpServers": {
-       "magisterium": {
-         "command": "node",
-         "args": ["--loader", "ts-node/esm", "mcp-magisterium.ts"],
-         "cwd": "/path/to/magisterium",
-          "env": {
-            "MAGISTERIUM_API_KEY": ""
-          }
-       }
-     }
-   }
-   ```
-
-2. **Other MCP Clients**: Use the provided `mcp-config.json` as a reference for configuration.
-
-## API Usage
-
-The code makes a direct API call to the Magisterium API:
+## Development
 
 ```bash
-curl -X POST https://www.magisterium.com/api/v1/chat/completions \
-    -H "Authorization: Bearer $MAGISTERIUM_API_KEY" \
-    -H "Content-Type: application/json" \
-    -d '{
-    "model": "magisterium-1",
-    "messages": [
-        {
-        "role": "user",
-        "content": "What is the Magisterium?"
-        }
-    ],
-    "stream": True
-    }'
+npm run build    # Compile TypeScript to dist/
+npm start        # Run the MCP server
+npm test         # Test server responds to MCP handshake
 ```
+
+The source is `mcp-magisterium.ts`. After editing, run `npm run build` to recompile.
+
+## Troubleshooting
+
+**"Cannot find module" errors** — Run `npm install` then `npm run build`.
+
+**"MAGISTERIUM_API_KEY environment variable is not set"** — Ensure `.env` exists in the project root with your API key. The `run-magisterium.sh` wrapper script `cd`s to the correct directory so dotenv can find it.
+
+**Server works manually but not in MCP client** — Use the `run-magisterium.sh` wrapper script (not `node` directly). It ensures the working directory is correct regardless of how the client spawns the process.
+
+**"0 tools enabled" in Cursor** — Fully quit and restart Cursor after adding the config. Check that the path in your config is correct and `run-magisterium.sh` is executable (`chmod +x run-magisterium.sh`).

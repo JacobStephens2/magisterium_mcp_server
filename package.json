@@ -1,19 +1,22 @@
 {
+  "name": "magisterium-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for querying the Magisterium API for authoritative Catholic Church teaching with citations",
   "type": "module",
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.1.0",
-    "dotenv": "^17.2.0",
-    "magisterium": "^0.0.5",
-    "node-fetch": "^2.7.0"
-  },
-  "devDependencies": {
-    "@types/node": "^24.1.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+  "engines": {
+    "node": ">=18.0.0"
   },
   "scripts": {
-    "mcp": "node --loader ts-node/esm mcp-magisterium.ts",
-    "build": "npx tsc",
-    "start": "node dist/magisterium.js"
+    "build": "tsc",
+    "start": "node dist/mcp-magisterium.js",
+    "test": "node test-server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.1.0",
+    "dotenv": "^17.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.8.3"
   }
 }

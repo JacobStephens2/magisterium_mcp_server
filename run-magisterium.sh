@@ -1,4 +1,4 @@
 #!/bin/bash
-cd /var/www/magisterium_mcp_server
-exec node mcp-magisterium.cjs
-
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+exec node dist/mcp-magisterium.js

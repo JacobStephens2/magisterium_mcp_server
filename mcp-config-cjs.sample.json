@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "magisterium": {
-      "command": "node",
-      "args": ["mcp-magisterium.cjs"],
-      "cwd": "/var/www/magisterium_mcp_server"
-    }
-  }
-} 

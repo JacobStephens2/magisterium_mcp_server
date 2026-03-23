@@ -1,12 +1,8 @@
 {
   "mcpServers": {
     "magisterium": {
-      "command": "node",
-      "args": ["mcp-magisterium.cjs"],
-      "cwd": "/var/www/magisterium_mcp_server",
-      "env": {
-        "NODE_ENV": "production"
-      }
+      "command": "/bin/bash",
+      "args": ["/path/to/magisterium_mcp_server/run-magisterium.sh"]
     }
   }
-} 
+}
