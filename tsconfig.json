@@ -12,7 +12,8 @@
     "types": ["node"]
   },
   "include": [
-    "mcp-magisterium.ts"
+    "mcp-magisterium.ts",
+    "web-server.ts"
   ],
   "exclude": [
     "node_modules",

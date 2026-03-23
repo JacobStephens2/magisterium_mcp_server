@@ -13,13 +13,18 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node dist/mcp-magisterium.js",
-    "test": "node test-server.js"
+    "test": "node test-server.js",
+    "web": "node dist/web-server.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.0",
-    "dotenv": "^17.2.0"
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.0",
+    "express": "^5.2.1"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "@types/node": "^22.0.0",
     "typescript": "^5.8.3"
   }
