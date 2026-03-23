@@ -30,7 +30,7 @@ Verify it works:
 npm test
 ```
 
-You should see a JSON response listing the `magisterium_query` tool.
+You should see output confirming the `magisterium_query` tool is available.
 
 ## Configuring MCP Clients
 
@@ -87,17 +87,18 @@ Then restart Cursor and enable the server under Settings > MCP Tools.
 }
 ```
 
-The response includes the teaching text, citations with document references, and optionally related questions.
+The response includes the formatted teaching text, citations with document titles and authors, and optionally related follow-up questions.
 
 ## Development
 
 ```bash
 npm run build    # Compile TypeScript to dist/
+npm run dev      # Watch mode — auto-rebuild on changes
 npm start        # Run the MCP server
 npm test         # Test server responds to MCP handshake
 ```
 
-The source is `mcp-magisterium.ts`. After editing, run `npm run build` to recompile.
+The source is `mcp-magisterium.ts`. After editing, run `npm run build` to recompile (or use `npm run dev` for auto-rebuild).
 
 ## Troubleshooting
 
