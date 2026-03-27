@@ -4,12 +4,39 @@ An [MCP](https://modelcontextprotocol.io/) server that provides AI assistants wi
 
 Exposes one tool — `magisterium_query` — that any MCP-compatible client (Claude Desktop, Claude Code, Cursor, etc.) can call.
 
-## Prerequisites
+## Remote MCP Endpoint
+
+The server is hosted at **https://magisterium.stephens.page/mcp** — no local install required.
+
+### Claude Code
+
+Add to `~/.claude/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "magisterium": {
+      "type": "url",
+      "url": "https://magisterium.stephens.page/mcp"
+    }
+  }
+}
+```
+
+### Claude Desktop / Cursor / Other MCP Clients
+
+Use the Streamable HTTP URL `https://magisterium.stephens.page/mcp` in your client's MCP configuration. Refer to your client's docs for the exact format.
+
+## Local Setup (Optional)
+
+If you prefer to run the server locally via stdio:
+
+### Prerequisites
 
 - **Node.js 18+** (check with `node --version`)
 - **Magisterium API key** from [magisterium.com](https://www.magisterium.com/)
 
-## Setup
+### Install
 
 ```bash
 git clone https://github.com/JacobStephens2/magisterium_mcp_server.git
@@ -30,13 +57,7 @@ Verify it works:
 npm test
 ```
 
-You should see output confirming the `magisterium_query` tool is available.
-
-## Configuring MCP Clients
-
-Copy `mcp-config.sample.json` and replace the path with your actual install location.
-
-### Claude Desktop / Claude Code
+### Configuring MCP Clients for Local Use
 
 Add to your MCP config (`claude_desktop_config.json` for Desktop, `~/.claude/settings.json` for Claude Code):
 
@@ -50,23 +71,6 @@ Add to your MCP config (`claude_desktop_config.json` for Desktop, `~/.claude/set
   }
 }
 ```
-
-### Cursor
-
-Add to `.cursor/mcp.json` (workspace) or `~/.config/cursor/mcp.json` (global):
-
-```json
-{
-  "mcpServers": {
-    "magisterium": {
-      "command": "/bin/bash",
-      "args": ["/path/to/magisterium_mcp_server/run-magisterium.sh"]
-    }
-  }
-}
-```
-
-Then restart Cursor and enable the server under Settings > MCP Tools.
 
 ## Tool: `magisterium_query`
 
@@ -89,16 +93,27 @@ Then restart Cursor and enable the server under Settings > MCP Tools.
 
 The response includes the formatted teaching text, citations with document titles and authors, and optionally related follow-up questions.
 
+## Architecture
+
+The server runs as a single Express process serving three endpoints:
+
+- **`/`** — Static frontend
+- **`/api/query`** — REST API for the frontend
+- **`/mcp`** — Streamable HTTP MCP endpoint for AI agents
+
+Apache reverse-proxies `/api` and `/mcp` to the Node.js backend; TLS is terminated at the edge via Let's Encrypt.
+
 ## Development
 
 ```bash
 npm run build    # Compile TypeScript to dist/
 npm run dev      # Watch mode — auto-rebuild on changes
-npm start        # Run the MCP server
+npm start        # Run the stdio MCP server
+npm run web      # Run the web server (REST API + MCP endpoint)
 npm test         # Test server responds to MCP handshake
 ```
 
-The source is `mcp-magisterium.ts`. After editing, run `npm run build` to recompile (or use `npm run dev` for auto-rebuild).
+The main source files are `web-server.ts` (Express server with REST + MCP endpoints) and `mcp-magisterium.ts` (stdio MCP server). After editing, run `npm run build` to recompile.
 
 ## Troubleshooting
 
