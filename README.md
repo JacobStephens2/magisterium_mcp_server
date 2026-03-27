@@ -23,6 +23,39 @@ Add to `~/.claude/settings.json`:
 }
 ```
 
+### OpenClaw
+
+Add to `~/.openclaw/openclaw.json`. OpenClaw's URL-based transport is in the schema but not yet fully supported at runtime ([#55087](https://github.com/openclaw/openclaw/issues/55087)), so use the stdio transport with a local install for now:
+
+```json5
+{
+  mcp: {
+    servers: {
+      "magisterium": {
+        command: "/bin/bash",
+        args: ["/path/to/magisterium_mcp_server/run-magisterium.sh"],
+      },
+    },
+  },
+}
+```
+
+Once OpenClaw ships native HTTP MCP support, you can switch to the remote endpoint:
+
+```json5
+{
+  mcp: {
+    servers: {
+      "magisterium": {
+        url: "https://magisterium.stephens.page/mcp",
+      },
+    },
+  },
+}
+```
+
+See the [Local Setup](#local-setup-optional) section below for install instructions.
+
 ### Claude Desktop / Cursor / Other MCP Clients
 
 Use the Streamable HTTP URL `https://magisterium.stephens.page/mcp` in your client's MCP configuration. Refer to your client's docs for the exact format.
