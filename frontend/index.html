@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magisterium</title>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W0D3PS27FK"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-W0D3PS27FK');
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 3rem 2rem 4rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        h1 {
+            font-family: 'Crimson Text', serif;
+            font-size: 2.2rem;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.4rem;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: #666;
+        }
+
+        .subtitle a {
+            color: #666;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .subtitle a:hover { color: #1a1a1a; }
+
+        /* Search */
+        .search-form {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.85rem 1.1rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus { border-color: #1a1a1a; }
+
+        .search-button {
+            padding: 0.85rem 1.8rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: #1a1a1a;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .search-button:hover { background: #333; }
+        .search-button:disabled { background: #999; cursor: not-allowed; }
+
+        /* Sample questions */
+        .samples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sample-btn {
+            padding: 0.4rem 0.85rem;
+            font-family: inherit;
+            font-size: 0.8rem;
+            color: #666;
+            background: #f8f8f8;
+            border: 1px solid #eee;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sample-btn:hover { border-color: #1a1a1a; color: #1a1a1a; }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 3rem 0;
+            color: #999;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .loading.visible { display: block; }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #eee;
+            border-top-color: #1a1a1a;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Error */
+        .error {
+            padding: 1rem 1.2rem;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 4px;
+            color: #991b1b;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .error.visible { display: block; }
+
+        /* Response */
+        .response { display: none; }
+        .response.visible { display: block; }
+
+        .answer {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .answer p { margin-bottom: 1rem; }
+        .answer strong { font-weight: 500; }
+
+        .answer h3 {
+            font-family: 'Crimson Text', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        .answer blockquote {
+            border-left: 2px solid #1a1a1a;
+            padding: 0.5rem 0 0.5rem 1.2rem;
+            margin: 1rem 0;
+            color: #555;
+            font-style: italic;
+        }
+
+        .answer ul, .answer ol {
+            margin: 0.75rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .answer li { margin-bottom: 0.4rem; }
+
+        /* Citations */
+        .citations-section {
+            border-top: 1px solid #f0f0f0;
+            padding-top: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #999;
+            margin-bottom: 1rem;
+        }
+
+        .citation {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f8f8f8;
+            font-size: 0.85rem;
+        }
+
+        .citation:last-child { border-bottom: none; }
+
+        .citation-title {
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .citation-author {
+            color: #999;
+            margin-left: 0.3rem;
+        }
+
+        .citation-text {
+            color: #666;
+            font-style: italic;
+            margin-top: 0.3rem;
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        .citation-link {
+            color: #666;
+            font-size: 0.8rem;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .citation-link:hover { color: #1a1a1a; }
+
+        /* Related questions */
+        .related-section {
+            border-top: 1px solid #f0f0f0;
+            padding-top: 1.5rem;
+        }
+
+        .related-btn {
+            display: inline-block;
+            padding: 0.45rem 0.9rem;
+            font-family: inherit;
+            font-size: 0.82rem;
+            color: #555;
+            background: #f8f8f8;
+            border: 1px solid #eee;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 0 0.4rem 0.5rem 0;
+            transition: all 0.2s;
+        }
+
+        .related-btn:hover { border-color: #1a1a1a; color: #1a1a1a; }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.8rem;
+            color: #999;
+            border-top: 1px solid #f0f0f0;
+            margin-top: 2rem;
+        }
+
+        .footer a { color: #666; text-decoration: underline; text-underline-offset: 2px; }
+        .footer a:hover { color: #1a1a1a; }
+
+        @media (max-width: 600px) {
+            .container { padding: 2rem 1.2rem 3rem; }
+            h1 { font-size: 1.8rem; }
+            .search-form { flex-direction: column; }
+            .search-button { padding: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Magisterium</h1>
+            <p class="subtitle">Ask a question about Catholic Church teaching &middot; powered by the <a href="https://www.magisterium.com/" target="_blank">Magisterium API</a></p>
+        </div>
+
+        <form class="search-form" id="search-form">
+            <input type="text" class="search-input" id="query-input" placeholder="e.g. What does the Church teach about the Eucharist?" autocomplete="off">
+            <button type="submit" class="search-button" id="submit-btn">Ask</button>
+        </form>
+
+        <div class="samples" id="samples">
+            <button type="button" class="sample-btn">What is the Eucharist?</button>
+            <button type="button" class="sample-btn">What does the Church teach about marriage?</button>
+            <button type="button" class="sample-btn">What is the Trinity?</button>
+            <button type="button" class="sample-btn">What are the corporal works of mercy?</button>
+        </div>
+
+        <div class="loading" id="loading">
+            <span class="spinner"></span> Querying the Magisterium...
+        </div>
+
+        <div class="error" id="error"></div>
+
+        <div class="response" id="response">
+            <div class="answer" id="answer"></div>
+            <div class="citations-section" id="citations-section">
+                <div class="section-label" id="citations-label"></div>
+                <div id="citations"></div>
+            </div>
+            <div class="related-section" id="related-section">
+                <div class="section-label">Related Questions</div>
+                <div id="related"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Responses generated by the <a href="https://www.magisterium.com/" target="_blank">Magisterium AI</a> &middot;
+        <a href="https://github.com/JacobStephens2/magisterium_mcp_server" target="_blank">GitHub</a> &middot;
+        <a href="https://stephens.page" target="_blank">stephens.page</a>
+    </div>
+
+    <script>
+        const form = document.getElementById('search-form');
+        const input = document.getElementById('query-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const response = document.getElementById('response');
+        const samplesEl = document.getElementById('samples');
+
+        // Sample question buttons
+        samplesEl.addEventListener('click', (e) => {
+            if (e.target.classList.contains('sample-btn')) {
+                input.value = e.target.textContent;
+                form.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Related question buttons
+        document.getElementById('related').addEventListener('click', (e) => {
+            if (e.target.classList.contains('related-btn')) {
+                input.value = e.target.textContent;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                form.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = input.value.trim();
+            if (!query) return;
+
+            // UI state
+            submitBtn.disabled = true;
+            loading.classList.add('visible');
+            error.classList.remove('visible');
+            response.classList.remove('visible');
+            samplesEl.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query }),
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({ error: 'Request failed' }));
+                    throw new Error(err.error || `HTTP ${res.status}`);
+                }
+
+                const data = await res.json();
+                renderResponse(data);
+            } catch (err) {
+                error.textContent = err.message;
+                error.classList.add('visible');
+            } finally {
+                submitBtn.disabled = false;
+                loading.classList.remove('visible');
+            }
+        });
+
+        function renderResponse(data) {
+            // Answer
+            const content = data.choices?.[0]?.message?.content || 'No response received.';
+            document.getElementById('answer').innerHTML = markdownToHtml(content);
+
+            // Citations
+            const citationsEl = document.getElementById('citations');
+            const citationsSection = document.getElementById('citations-section');
+            const citationsLabel = document.getElementById('citations-label');
+            citationsEl.innerHTML = '';
+
+            if (data.citations && data.citations.length > 0) {
+                // Deduplicate by document_title
+                const seen = new Set();
+                const unique = data.citations.filter(c => {
+                    if (seen.has(c.document_title)) return false;
+                    seen.add(c.document_title);
+                    return true;
+                });
+
+                citationsLabel.textContent = `Sources (${unique.length})`;
+                citationsSection.style.display = 'block';
+
+                for (const cite of unique) {
+                    const div = document.createElement('div');
+                    div.className = 'citation';
+
+                    let html = `<span class="citation-title">${esc(cite.document_title)}</span>`;
+                    if (cite.document_author) {
+                        html += `<span class="citation-author">&mdash; ${esc(cite.document_author)}</span>`;
+                    }
+                    if (cite.cited_text) {
+                        const truncated = cite.cited_text.length > 200
+                            ? cite.cited_text.substring(0, 200) + '...'
+                            : cite.cited_text;
+                        html += `<div class="citation-text">"${esc(truncated)}"</div>`;
+                    }
+                    if (cite.source_url) {
+                        html += `<a href="${esc(cite.source_url)}" class="citation-link" target="_blank">View source</a>`;
+                    }
+
+                    div.innerHTML = html;
+                    citationsEl.appendChild(div);
+                }
+            } else {
+                citationsSection.style.display = 'none';
+            }
+
+            // Related questions
+            const relatedEl = document.getElementById('related');
+            const relatedSection = document.getElementById('related-section');
+            relatedEl.innerHTML = '';
+
+            if (data.related_questions && data.related_questions.length > 0) {
+                relatedSection.style.display = 'block';
+                for (const q of data.related_questions) {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'related-btn';
+                    btn.textContent = q;
+                    relatedEl.appendChild(btn);
+                }
+            } else {
+                relatedSection.style.display = 'none';
+            }
+
+            response.classList.add('visible');
+        }
+
+        function markdownToHtml(md) {
+            return md
+                // Strip footnote markers
+                .replace(/\[\^\d+\]/g, '')
+                // Bold
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                // Italic
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                // H3
+                .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+                // Blockquotes (multi-line)
+                .replace(/(^>\s?.+\n?)+/gm, (match) => {
+                    const text = match.replace(/^>\s?/gm, '').trim();
+                    return '<blockquote>' + text + '</blockquote>';
+                })
+                // Unordered list blocks
+                .replace(/(^- .+\n?)+/gm, (match) => {
+                    const items = match.trim().split('\n').map(l =>
+                        '<li>' + l.replace(/^- /, '') + '</li>'
+                    ).join('');
+                    return '<ul>' + items + '</ul>';
+                })
+                // Ordered list blocks
+                .replace(/(^\d+\. .+\n?)+/gm, (match) => {
+                    const items = match.trim().split('\n').map(l =>
+                        '<li>' + l.replace(/^\d+\. /, '') + '</li>'
+                    ).join('');
+                    return '<ol>' + items + '</ol>';
+                })
+                // Paragraphs
+                .split('\n\n')
+                .map(block => {
+                    block = block.trim();
+                    if (!block) return '';
+                    if (/^<(h3|blockquote|ul|ol)/.test(block)) return block;
+                    return '<p>' + block.replace(/\n/g, ' ') + '</p>';
+                })
+                .join('\n');
+        }
+
+        function esc(s) {
+            const d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+    </script>
+</body>
+</html>
