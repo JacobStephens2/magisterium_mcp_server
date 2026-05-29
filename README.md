@@ -1,3 +1,7 @@
+> **[ARCHIVED]** Built in 2025 before an official Magisterium MCP server existed, for personal use in Cursor. Archived now that I've moved tooling and the gap this filled has closed. Kept as a reference example of an MCP server integrating an external API — demonstrating early MCP adoption, end-to-end deployment, and AI-assistant integration.
+
+---
+
 # Magisterium MCP Server
 
 An [MCP](https://modelcontextprotocol.io/) server that provides AI assistants with access to the [Magisterium API](https://www.magisterium.com/) for authoritative Catholic Church teaching with citations.
